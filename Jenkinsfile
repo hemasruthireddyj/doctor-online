@@ -13,9 +13,13 @@ pipeline{
            }
            stage("deploy"){
                steps{
-                   sshPublisher(publishers: [sshPublisherDesc(configName: 'tomcatt', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: '''
-/opt/tomcat9/bin/shutdown.sh
-/opt/tomcat9/bin/startup.sh''', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: 'webapps', remoteDirectorySDF: false, removePrefix: 'target', sourceFiles: 'target/doctor-online.war')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+                    sshagent(['tomcatt']) {
+                    // COPY WAR FILE TO TOMCAT
+                    sh "scp -o StrictHostKeyChecking=no target/doctor-online.war ec2-user@3.238.73.64:/opt/tomcat9/webapps"
+                    // Stop tomcat
+                    sh "ssh ec2-user@3.238.73.64/opt/tomcat9/bin/shutdown.sh"
+                    // start tomcat
+                    sh "ssh ec2-user@3.238.73.64 /opt/tomcat9/bin/startup.sh"
 
                }
            }
