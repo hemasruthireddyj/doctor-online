@@ -1,11 +1,6 @@
 pipeline{
     agent any
        stages{
-           stage("git"){
-               steps{
-               git branch: 'main', credentialsId: 'hemasruthireddyj@gmail.com', url: 'https://github.com/hemasruthireddyj/doctor-online'
-               }
-           }
            stage("maven build"){
              steps{
                  sh "mvn clean package"
